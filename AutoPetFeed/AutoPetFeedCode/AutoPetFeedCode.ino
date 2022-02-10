@@ -1,5 +1,6 @@
-#include "Arduino.h"
+#include <Arduino.h>
 #include <RTClib.h>
+#include <Servo.h>
 
 const int servo1Pin = 8;
 const int servo2Pin = 9;
