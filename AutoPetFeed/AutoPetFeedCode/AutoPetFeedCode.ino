@@ -1,6 +1,6 @@
 #include <Arduino.h>
-#include <RTClib.h>
 #include <Servo.h>
+#include <RTClib.h>
 
 const int servo1Pin = 8;
 const int servo2Pin = 9;
@@ -28,6 +28,7 @@ private:
 };
 
 Hx711 scale(A1, A0);
+
 Hx711::Hx711(uint8_t pin_dout, uint8_t pin_slk)
   : DOUT(pin_dout), SCK(pin_slk) {
   pinMode(SCK, OUTPUT);
@@ -97,29 +98,7 @@ void showWeight() {
 
 void showDate() {
   DateTime now = rtc.now();
-
   Serial.println(now.tostr(buf));
-
-  Serial.print(" since midnight 1970/01/01 = ");
-  Serial.print(now.unixtime());
-  Serial.print("s = ");
-  Serial.print(now.unixtime() / 86400L);
-  Serial.println("d");
-
-  // calculate a date which is 7 days and 30 seconds into the future
-  DateTime future(now + (7 * 86400L + 30));
-
-  Serial.print(" now + 7d + 30s: ");
-  Serial.println(future.tostr(buf));
-
-  // calculate a date which is 30 days before
-  DateTime past(now - TimeDelta(30 * 86400L));
-
-  Serial.print(" now - 30d: ");
-  Serial.println(past.tostr(buf));
-
-  Serial.println();
-  delay(100);
 }
 
 void setup() {
@@ -128,13 +107,15 @@ void setup() {
 
   rtc.begin();
 
-  if (!rtc.isrunning()) {
-    Serial.println("RTC is NOT running!");
-    // following line sets the RTC to the date & time this sketch was compiled
-    rtc.adjust(DateTime(__DATE__, __TIME__));
-  }
+  // if (!rtc.isrunning()) {
+  //   Serial.println("RTC is NOT running!");
+  //   // following line sets the RTC to the date & time this sketch was compiled
+  //   rtc.adjust(DateTime(__DATE__, __TIME__));
+  // }
 }
 
 void loop() {
-  
+  //showWeight();
+  showDate();
+  delay(1000);
 }
