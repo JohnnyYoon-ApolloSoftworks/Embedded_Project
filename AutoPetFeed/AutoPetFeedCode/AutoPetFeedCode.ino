@@ -1,5 +1,5 @@
 #include <Servo.h>
-#include <RTClib.h> // RTCLib_by_NeiroN
+#include <RTClib_Johnny.h>
 
 const int servo1Pin = 8;
 const int servo2Pin = 9;
@@ -7,7 +7,10 @@ const int servo3Pin = 10;
 const int buzzerPin = 12;
 
 DS1302 rtc;
+
 char buf[20];
+char bufHours[4];
+char bufMinutes[4];
 
 Servo servo1;
 Servo servo2;
@@ -18,6 +21,27 @@ const int angle450Delay = 4500;
 const int stopDelay = 1000;
 const int servoRun = 80;
 const int servoStop = 90;
+
+uint8_t servo1BreakfastHour = 255;
+uint8_t servo1BreakfastMinute = 255;
+uint8_t servo1LunchHour = 255;
+uint8_t servo1LunchMinute = 255;
+uint8_t servo1DinnerHour = 255;
+uint8_t servo1DinnerMinute = 255;
+
+uint8_t servo2BreakfastHour = 255;
+uint8_t servo2BreakfastMinute = 255;
+uint8_t servo2LunchHour = 255;
+uint8_t servo2LunchMinute = 255;
+uint8_t servo2DinnerHour = 255;
+uint8_t servo2DinnerMinute = 255;
+
+uint8_t servo3BreakfastHour = 255;
+uint8_t servo3BreakfastMinute = 255;
+uint8_t servo3LunchHour = 255;
+uint8_t servo3LunchMinute = 255;
+uint8_t servo3DinnerHour = 255;
+uint8_t servo3DinnerMinute = 255;
 class Hx711
 {
 public:
@@ -139,19 +163,32 @@ void servoCalibration()
 void servo1Run(int gram)
 {
   servo1.attach(servo1Pin);
-  if ((scale.gram() * 2) < gram)
+
+  // if ((scale.gram() * 2) < gram)
+  // {
+  //   servo1.write(servoRun);
+  //   delay(angle225Delay);
+  //   servo1.write(servoStop);
+  //   delay(stopDelay);
+  // }
+
+  while ((scale.gram() * 2) < gram)
   {
+    if ((scale.gram() * 2) >= gram)
+      break;
     servo1.write(servoRun);
     delay(angle225Delay);
     servo1.write(servoStop);
     delay(stopDelay);
   }
+
   servo1.detach();
 }
 
 void servo2Run(int count = 1)
 {
   servo2.attach(servo2Pin);
+
   for (int i = 0; i < count; i++)
   {
     servo2.write(servoRun);
@@ -159,12 +196,14 @@ void servo2Run(int count = 1)
     servo2.write(servoStop);
     delay(stopDelay);
   }
+
   servo2.detach();
 }
 
 void servo3Run(int count = 1)
 {
   servo3.attach(servo3Pin);
+
   for (int i = 0; i < count; i++)
   {
     servo3.write(servoRun);
@@ -172,34 +211,89 @@ void servo3Run(int count = 1)
     servo3.write(servoStop);
     delay(stopDelay);
   }
+
   servo3.detach();
 }
 
-void bluetoothCommunication()
+void bluetoothRecieve()
 {
-  if (Serial1.available())
+  String buffer = Serial1.readStrigUntil('\n');
+
+  int firstSeparator = buffer.indexOf("/", 0);
+  int secondSeparotr = buffer.indexOf("/", (firstSeparator + 1));
+  int lengthOfBuffer = buffer.length();
+
+  String mode = buffer.substring(0, firstSeparator);
+
+  switch (mode)
   {
-    Serial.write(Serial1.read());
-  }
-  if (Serial.available())
-  {
-    Serial1.write(Serial.read());
+  case A:
+    /* code */
+    break;
+
+  case B:
+    /* code */
+    break;
+
+  case C:
+    /* code */
+    break;
+
+  case D:
+    /* code */
+    break;
+
+  case E:
+    /* code */
+    break;
+    
+  case F:
+    /* code */
+    break;
+
+  case G:
+    /* code */
+    break;
+
+  case H:
+    /* code */
+    break;
+
+  case I:
+    /* code */
+    break;
+
+  case J:
+    /* code */
+    break;
+
+  case K:
+    /* code */
+    break;
+
+  case L:
+    /* code */
+    break;
+  
+  default:
+    //nothing
+    break;
   }
 }
 
 void buzzerAlarm(int num = 1)
 {
-  for(int i = 0; i < num; i++)
+  for (int i = 0; i < num; i++)
   {
-  digitalWrite(buzzerPin, HIGH);
-  delay(100);
-  digitalWrite(buzzerPin, LOW);
-  delay(100);
+    digitalWrite(buzzerPin, HIGH);
+    delay(100);
+    digitalWrite(buzzerPin, LOW);
+    delay(100);
   }
   delay(500);
 }
 
-void debug() 
+void debug()
 {
   showWeight();
   showDate();
@@ -213,12 +307,10 @@ void setup()
   rtc.begin();
 
   pinMode(buzzerPin, OUTPUT);
-  rtcCalibration();
 }
 
 void loop()
 {
-  // buzzerAlarm(2);
   debug();
   delay(100);
 }
