@@ -1,137 +1,13 @@
 #include <Servo.h>
 #include <RTClib_Johnny.h>
+#include "HX711_ASW.h"
+#include "settings.h"
 
-const int servo1Pin = 8;
-const int servo2Pin = 9;
-const int servo3Pin = 10;
-const int buzzerPin = 12;
-
+Hx711 scale(A1, A0);
 DS1302 rtc;
-
-char buf[20];
-char bufHours[4];
-char bufMinutes[4];
-
 Servo servo1;
 Servo servo2;
 Servo servo3;
-
-const int angle225Delay = 3000;
-const int angle450Delay = 4500;
-const int stopDelay = 1000;
-const int servoRun = 80;
-const int servoStop = 90;
-
-uint8_t servo1BreakfastHour = 255;
-uint8_t servo1BreakfastMinute = 255;
-uint8_t servo1LunchHour = 255;
-uint8_t servo1LunchMinute = 255;
-uint8_t servo1DinnerHour = 255;
-uint8_t servo1DinnerMinute = 255;
-
-uint8_t servo2BreakfastHour = 255;
-uint8_t servo2BreakfastMinute = 255;
-uint8_t servo2LunchHour = 255;
-uint8_t servo2LunchMinute = 255;
-uint8_t servo2DinnerHour = 255;
-uint8_t servo2DinnerMinute = 255;
-
-uint8_t servo3BreakfastHour = 255;
-uint8_t servo3BreakfastMinute = 255;
-uint8_t servo3LunchHour = 255;
-uint8_t servo3LunchMinute = 255;
-uint8_t servo3DinnerHour = 255;
-uint8_t servo3DinnerMinute = 255;
-class Hx711
-{
-public:
-  Hx711(uint8_t pin_din, uint8_t pin_slk);
-  virtual ~Hx711();
-  long value();
-  long nomalvalue(byte times = 8);
-  void setOffset(long offset);
-  void setScale(float scale = 742.f);
-  float gram();
-
-private:
-  const uint8_t DOUT;
-  const uint8_t SCK;
-  long _offset;
-  float _scale;
-};
-
-Hx711 scale(A1, A0);
-
-Hx711::Hx711(uint8_t pin_dout, uint8_t pin_slk)
-    : DOUT(pin_dout), SCK(pin_slk)
-{
-  pinMode(SCK, OUTPUT);
-  pinMode(DOUT, INPUT);
-
-  digitalWrite(SCK, HIGH);
-  delayMicroseconds(100);
-  digitalWrite(SCK, LOW);
-
-  nomalvalue();
-  this->setOffset(nomalvalue());
-  this->setScale();
-}
-
-Hx711::~Hx711()
-{
-}
-
-long Hx711::nomalvalue(byte times)
-{
-  long sum = 0;
-  for (byte i = 0; i < times; i++)
-  {
-    sum += value();
-  }
-
-  return sum / times;
-}
-
-long Hx711::value()
-{
-  byte data[3];
-
-  while (digitalRead(DOUT))
-    ;
-
-  for (byte j = 3; j--;)
-  {
-    for (char i = 8; i--;)
-    {
-      digitalWrite(SCK, HIGH);
-      bitWrite(data[j], i, digitalRead(DOUT));
-      digitalWrite(SCK, LOW);
-    }
-  }
-
-  digitalWrite(SCK, HIGH);
-  digitalWrite(SCK, LOW);
-
-  data[2] ^= 0x80;
-
-  return ((uint32_t)data[2] << 16) | ((uint32_t)data[1] << 8) | (uint32_t)data[0];
-}
-
-void Hx711::setOffset(long offset)
-{
-  _offset = offset;
-}
-
-void Hx711::setScale(float scale)
-{
-  _scale = scale;
-}
-
-float Hx711::gram()
-{
-  long val = (nomalvalue() - _offset);
-  return (float)val / _scale;
-}
 
 void showWeight()
 {
@@ -160,7 +36,7 @@ void servoCalibration()
   servo3.write(servoStop);
 }
 
-void servo1Run(int gram)
+void servo1Run()
 {
   servo1.attach(servo1Pin);
 
@@ -172,9 +48,9 @@ void servo1Run(int gram)
   //   delay(stopDelay);
   // }
 
-  while ((scale.gram() * 2) < gram)
+  while ((scale.gram() * 2) < servo1Gram)
   {
-    if ((scale.gram() * 2) >= gram)
+    if ((scale.gram() * 2) >= servo1Gram)
       break;
     servo1.write(servoRun);
     delay(angle225Delay);
@@ -185,11 +61,11 @@ void servo1Run(int gram)
   servo1.detach();
 }
 
-void servo2Run(int count = 1)
+void servo2Run()
 {
   servo2.attach(servo2Pin);
 
-  for (int i = 0; i < count; i++)
+  for (int i = 0; i < servo2Count; i++)
   {
     servo2.write(servoRun);
     delay(angle225Delay);
@@ -200,11 +76,11 @@ void servo2Run(int count = 1)
   servo2.detach();
 }
 
-void servo3Run(int count = 1)
+void servo3Run()
 {
   servo3.attach(servo3Pin);
 
-  for (int i = 0; i < count; i++)
+  for (int i = 0; i < servo3Count; i++)
   {
     servo3.write(servoRun);
     delay(angle450Delay);
@@ -217,64 +93,73 @@ void servo3Run(int count = 1)
 
 void bluetoothRecieve()
 {
-  String buffer = Serial1.readStrigUntil('\n');
+  String buffer = Serial1.readStringUntil('\n');
 
   int firstSeparator = buffer.indexOf("/", 0);
-  int secondSeparotr = buffer.indexOf("/", (firstSeparator + 1));
+  int secondSeparator = buffer.indexOf("/", (firstSeparator + 1));
   int lengthOfBuffer = buffer.length();
 
-  String mode = buffer.substring(0, firstSeparator);
+  int modeBuffer = buffer.substring(0, firstSeparator).toInt();
 
-  switch (mode)
+  switch (modeBuffer)
   {
-  case A:
-    /* code */
+  case 1:
+    servo1Gram = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
     break;
 
-  case B:
-    /* code */
+  case 11:
+    servo1BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo1BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case C:
-    /* code */
+  case 12:
+    servo1LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo1LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case D:
-    /* code */
+  case 13:
+    servo1DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo1DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case E:
-    /* code */
-    break;
-    
-  case F:
-    /* code */
+  case 2:
+    servo2Count = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
     break;
 
-  case G:
-    /* code */
+  case 21:
+    servo2BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo2BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case H:
-    /* code */
+  case 22:
+    servo2LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo2LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case I:
-    /* code */
+  case 23:
+    servo2DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo2DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case J:
-    /* code */
+  case 3:
+    servo3Count = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
     break;
 
-  case K:
-    /* code */
+  case 31:
+    servo3BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo3BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
 
-  case L:
-    /* code */
+  case 32:
+    servo3LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo3LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
     break;
-  
+
+  case 33:
+    servo3DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    servo3DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
+    break;
+
   default:
     //nothing
     break;
@@ -311,6 +196,9 @@ void setup()
 
 void loop()
 {
+  if (Serial1.available())
+    bluetoothRecieve();
+
   debug();
   delay(100);
 }
