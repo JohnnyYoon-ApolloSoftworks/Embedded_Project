@@ -339,10 +339,7 @@ void setup()
 {
   Serial.begin(9600);
   Serial1.begin(9600);
-
   rtc.begin();
-
-  pinMode(buzzerPin, OUTPUT);
 
   stepMotor1.setSpeed(300);
   stepMotor2.setSpeed(300);

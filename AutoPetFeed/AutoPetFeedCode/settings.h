@@ -15,7 +15,7 @@ const int motor3In2Pin = 48;
 const int motor3In3Pin = 50; 
 const int motor3In4Pin = 52; 
 
-const int buzzerPin = 8;
+const int buzzerPin = 7;
 
 char buf[20];
 
