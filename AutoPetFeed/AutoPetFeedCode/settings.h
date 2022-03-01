@@ -1,51 +1,63 @@
-//디버깅 모드 20씩 빼세요
-const int servo1Pin = 28; 
-const int servo2Pin = 29;
-const int servo3Pin = 30;
-const int buzzerPin = 32;
+const int stepsPerRevolution = 64; // 11.25도
+
+const int motor1In1Pin = 30; 
+const int motor1In2Pin = 32; 
+const int motor1In3Pin = 34; 
+const int motor1In4Pin = 36; 
+
+const int motor2In1Pin = 38; 
+const int motor2In2Pin = 40; 
+const int motor2In3Pin = 42; 
+const int motor2In4Pin = 44; 
+
+const int motor3In1Pin = 46; 
+const int motor3In2Pin = 48; 
+const int motor3In3Pin = 50; 
+const int motor3In4Pin = 52; 
+
+const int buzzerPin = 8;
 
 char buf[20];
 
-bool servo1ReserveState = false;
-bool servo1RunState = false;
-bool servo2ReserveState = false;
-bool servo2RunState = false;
-bool servo3ReserveState = false;
-bool servo3RunState = false;
+bool motor1ReserveState = false;
+bool motor1FeedState = false;
+bool motor2ReserveState = false;
+bool motor2FeedState = false;
+bool motor3ReserveState = false;
+bool motor3FeedState = false;
 
-int servo1ResetTime = 255;
-int servo2ResetTime = 255;
-int servo3ResetTime = 255;
+int motor1ResetTime = 255;
+int motor2ResetTime = 255;
+int motor3ResetTime = 255;
 
-const int angle225Delay = 3000;
-const int angle450Delay = 4500;
-const int stopDelay = 1000;
-const int servoRun = 80;
-const int servoStop = 90;
+const int angleDelay = 55;
+const int stopDelay = 500;
+const int motorRun = 80;
+const int motorStop = 90;
 
-int servo1Gram = 100;
+int motor1Gram = 100;
 
-int servo1BreakfastHour = 255;
-int servo1BreakfastMinute = 255;
-int servo1LunchHour = 255;
-int servo1LunchMinute = 255;
-int servo1DinnerHour = 255;
-int servo1DinnerMinute = 255;
+int motor1BreakfastHour = 255;
+int motor1BreakfastMinute = 255;
+int motor1LunchHour = 255;
+int motor1LunchMinute = 255;
+int motor1DinnerHour = 255;
+int motor1DinnerMinute = 255;
 
-int servo2Count = 1;
+int motor2Count = 1;
 
-int servo2BreakfastHour = 255;
-int servo2BreakfastMinute = 255;
-int servo2LunchHour = 255;
-int servo2LunchMinute = 255;
-int servo2DinnerHour = 255;
-int servo2DinnerMinute = 255;
+int motor2BreakfastHour = 255;
+int motor2BreakfastMinute = 255;
+int motor2LunchHour = 255;
+int motor2LunchMinute = 255;
+int motor2DinnerHour = 255;
+int motor2DinnerMinute = 255;
 
-int servo3Count = 1;
+int motor3Count = 1;
 
-int servo3BreakfastHour = 255;
-int servo3BreakfastMinute = 255;
-int servo3LunchHour = 255;
-int servo3LunchMinute = 255;
-int servo3DinnerHour = 255;
-int servo3DinnerMinute = 255;
+int motor3BreakfastHour = 255;
+int motor3BreakfastMinute = 255;
+int motor3LunchHour = 255;
+int motor3LunchMinute = 255;
+int motor3DinnerHour = 255;
+int motor3DinnerMinute = 255;
