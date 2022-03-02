@@ -15,15 +15,21 @@ const int motor3In2Pin = 48;
 const int motor3In3Pin = 50; 
 const int motor3In4Pin = 52; 
 
-const int buzzerPin = 7;
+const int buzzerPin = 9;
 
 char buf[20];
 
-bool motor1ReserveState = false;
+bool motor1ReserveStateBreakfast = false;
+bool motor1ReserveStateLunch = false;
+bool motor1ReserveStateDinner = false;
 bool motor1FeedState = false;
-bool motor2ReserveState = false;
+bool motor2ReserveStateBreakfast = false;
+bool motor2ReserveStateLunch = false;
+bool motor2ReserveStateDinner = false;
 bool motor2FeedState = false;
-bool motor3ReserveState = false;
+bool motor3ReserveStateBreakfast = false;
+bool motor3ReserveStateLunch = false;
+bool motor3ReserveStateDinner = false;
 bool motor3FeedState = false;
 
 int motor1ResetTime = 255;
@@ -35,29 +41,21 @@ const int stopDelay = 500;
 const int motorRun = 80;
 const int motorStop = 90;
 
-int motor1Gram = 100;
+int motorBreakfastHour = 255;
+int motorBreakfastMinute = 255;
+int motorLunchHour = 255;
+int motorLunchMinute = 255;
+int motorDinnerHour = 255;
+int motorDinnerMinute = 255;
 
-int motor1BreakfastHour = 255;
-int motor1BreakfastMinute = 255;
-int motor1LunchHour = 255;
-int motor1LunchMinute = 255;
-int motor1DinnerHour = 255;
-int motor1DinnerMinute = 255;
+int motor1GramBreakfast = -100;
+int motor1GramLunch = -100;
+int motor1GramDinner = -100;
 
-int motor2Count = 1;
+int motor2CountBreakfast = 0;
+int motor2CountLunch = 0;
+int motor2CountDinner = 0;
 
-int motor2BreakfastHour = 255;
-int motor2BreakfastMinute = 255;
-int motor2LunchHour = 255;
-int motor2LunchMinute = 255;
-int motor2DinnerHour = 255;
-int motor2DinnerMinute = 255;
-
-int motor3Count = 1;
-
-int motor3BreakfastHour = 255;
-int motor3BreakfastMinute = 255;
-int motor3LunchHour = 255;
-int motor3LunchMinute = 255;
-int motor3DinnerHour = 255;
-int motor3DinnerMinute = 255;
+int motor3CountBreakfast = 0;
+int motor3CountLunch = 0;
+int motor3CountDinner = 0;

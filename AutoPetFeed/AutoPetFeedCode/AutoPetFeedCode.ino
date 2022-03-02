@@ -49,11 +49,11 @@ void buzzerAlarm(int num)
   delay(500);
 }
 
-void motor1Feed()
+void motor1Feed(int gram)
 {
-  while ((scale.gram() * 2) < motor1Gram)
+  while ((scale.gram() * 2) < gram)
   {
-    if ((scale.gram() * 2) >= motor1Gram)
+    if ((scale.gram() * 2) >= gram)
       break;
 
     stepMotor1.step(stepsPerRevolution * 4);
@@ -62,9 +62,9 @@ void motor1Feed()
   buzzerAlarm(1);
 }
 
-void motor2Feed()
+void motor2Feed(int count)
 {
-  for (int i = 0; i < motor2Count; i++)
+  for (int i = 0; i < count; i++)
   {
     stepMotor2.step(stepsPerRevolution * 2);
     delay(100);
@@ -72,9 +72,9 @@ void motor2Feed()
   buzzerAlarm(2);
 }
 
-void motor3Feed()
+void motor3Feed(int count)
 {
-  for (int i = 0; i < motor3Count; i++)
+  for (int i = 0; i < count; i++)
   {
     stepMotor3.step(stepsPerRevolution * 4);
     delay(100);
@@ -86,20 +86,56 @@ void motor1Operating()
 {
   DateTime now = rtc.now();
 
-  if ((now.hour() == motor1BreakfastHour && now.minute() == motor1BreakfastMinute) ||
-      (now.hour() == motor1LunchHour && now.minute() == motor1LunchMinute) ||
-      (now.hour() == motor1DinnerHour && now.minute() == motor1DinnerMinute))
+  if ((now.hour() == motorBreakfastHour && now.minute() == motorBreakfastMinute))
   {
-    motor1ReserveState = true;
-    motor1ResetTime = now.minute() + 3;
+    motor1ReserveStateBreakfast = true;
+    motor1ResetTime = now.minute() + 2;
 
     if (motor1ResetTime >= 60)
       motor1ResetTime -= 60;
   }
 
-  if (motor1ReserveState == true && motor1FeedState == false)
+  if (motor1ReserveStateBreakfast == true && motor1FeedState == false)
   {
-    motor1Feed();
+    motor1Feed(motor1GramBreakfast);
+    motor1FeedState = true;
+
+    Serial.println("motor1 is running now");
+    Serial.print("motor1 ResetTime is ");
+    Serial.println(motor1ResetTime);
+  }
+
+  if ((now.hour() == motorLunchHour && now.minute() == motorLunchMinute))
+  {
+    motor1ReserveStateLunch = true;
+    motor1ResetTime = now.minute() + 2;
+
+    if (motor1ResetTime >= 60)
+      motor1ResetTime -= 60;
+  }
+
+  if (motor1ReserveStateLunch == true && motor1FeedState == false)
+  {
+    motor1Feed(motor1GramLunch);
+    motor1FeedState = true;
+
+    Serial.println("motor1 is running now");
+    Serial.print("motor1 ResetTime is ");
+    Serial.println(motor1ResetTime);
+  }
+
+  if ((now.hour() == motorDinnerHour && now.minute() == motorDinnerMinute))
+  {
+    motor1ReserveStateDinner = true;
+    motor1ResetTime = now.minute() + 2;
+
+    if (motor1ResetTime >= 60)
+      motor1ResetTime -= 60;
+  }
+
+  if (motor1ReserveStateDinner == true && motor1FeedState == false)
+  {
+    motor1Feed(motor1GramDinner);
     motor1FeedState = true;
 
     Serial.println("motor1 is running now");
@@ -112,7 +148,9 @@ void motor1Operating()
     if (motor1FeedState)
       Serial.println("motor1 Reset!");
 
-    motor1ReserveState = false;
+    motor1ReserveStateBreakfast = false;
+    motor1ReserveStateLunch = false;
+    motor1ReserveStateDinner = false;
     motor1FeedState = false;
   }
 }
@@ -121,20 +159,56 @@ void motor2Operating()
 {
   DateTime now = rtc.now();
 
-  if ((now.hour() == motor2BreakfastHour && now.minute() == motor2BreakfastMinute) ||
-      (now.hour() == motor2LunchHour && now.minute() == motor2LunchMinute) ||
-      (now.hour() == motor2DinnerHour && now.minute() == motor2DinnerMinute))
+  if ((now.hour() == motorBreakfastHour && now.minute() == motorBreakfastMinute))
   {
-    motor2ReserveState = true;
-    motor2ResetTime = now.minute() + 3;
+    motor2ReserveStateBreakfast = true;
+    motor2ResetTime = now.minute() + 2;
 
     if (motor2ResetTime >= 60)
       motor2ResetTime -= 60;
   }
 
-  if (motor2ReserveState == true && motor2FeedState == false)
+  if (motor2ReserveStateBreakfast == true && motor2FeedState == false)
   {
-    motor2Feed();
+    motor2Feed(motor2CountBreakfast);
+    motor2FeedState = true;
+
+    Serial.println("motor2 is running now");
+    Serial.print("motor2 ResetTime is ");
+    Serial.println(motor2ResetTime);
+  }
+
+  if ((now.hour() == motorLunchHour && now.minute() == motorLunchMinute))
+  {
+    motor2ReserveStateLunch = true;
+    motor2ResetTime = now.minute() + 2;
+
+    if (motor2ResetTime >= 60)
+      motor2ResetTime -= 60;
+  }
+
+  if (motor2ReserveStateLunch == true && motor2FeedState == false)
+  {
+    motor2Feed(motor2CountLunch);
+    motor2FeedState = true;
+
+    Serial.println("motor2 is running now");
+    Serial.print("motor2 ResetTime is ");
+    Serial.println(motor2ResetTime);
+  }
+
+  if ((now.hour() == motorDinnerHour && now.minute() == motorDinnerMinute))
+  {
+    motor2ReserveStateDinner = true;
+    motor2ResetTime = now.minute() + 2;
+
+    if (motor2ResetTime >= 60)
+      motor2ResetTime -= 60;
+  }
+
+  if (motor2ReserveStateDinner == true && motor2FeedState == false)
+  {
+    motor2Feed(motor2CountDinner);
     motor2FeedState = true;
 
     Serial.println("motor2 is running now");
@@ -147,7 +221,9 @@ void motor2Operating()
     if (motor2FeedState)
       Serial.println("motor2 Reset!");
 
-    motor2ReserveState = false;
+    motor2ReserveStateBreakfast = false;
+    motor2ReserveStateLunch = false;
+    motor2ReserveStateDinner = false;
     motor2FeedState = false;
   }
 }
@@ -156,20 +232,56 @@ void motor3Operating()
 {
   DateTime now = rtc.now();
 
-  if ((now.hour() == motor3BreakfastHour && now.minute() == motor3BreakfastMinute) ||
-      (now.hour() == motor3LunchHour && now.minute() == motor3LunchMinute) ||
-      (now.hour() == motor3DinnerHour && now.minute() == motor3DinnerMinute))
+  if ((now.hour() == motorBreakfastHour && now.minute() == motorBreakfastMinute))
   {
-    motor3ReserveState = true;
-    motor3ResetTime = now.minute() + 3;
+    motor3ReserveStateBreakfast = true;
+    motor3ResetTime = now.minute() + 2;
 
     if (motor3ResetTime >= 60)
       motor3ResetTime -= 60;
   }
 
-  if (motor3ReserveState == true && motor3FeedState == false)
+  if (motor3ReserveStateBreakfast == true && motor3FeedState == false)
   {
-    motor3Feed();
+    motor3Feed(motor3CountBreakfast);
+    motor3FeedState = true;
+
+    Serial.println("motor3 is running now");
+    Serial.print("motor3 ResetTime is ");
+    Serial.println(motor3ResetTime);
+  }
+
+  if ((now.hour() == motorLunchHour && now.minute() == motorLunchMinute))
+  {
+    motor3ReserveStateLunch = true;
+    motor3ResetTime = now.minute() + 2;
+
+    if (motor3ResetTime >= 60)
+      motor3ResetTime -= 60;
+  }
+
+  if (motor3ReserveStateLunch == true && motor3FeedState == false)
+  {
+    motor3Feed(motor3CountLunch);
+    motor3FeedState = true;
+
+    Serial.println("motor3 is running now");
+    Serial.print("motor3 ResetTime is ");
+    Serial.println(motor3ResetTime);
+  }
+
+  if ((now.hour() == motorDinnerHour && now.minute() == motorDinnerMinute))
+  {
+    motor3ReserveStateDinner = true;
+    motor3ResetTime = now.minute() + 2;
+
+    if (motor3ResetTime >= 60)
+      motor3ResetTime -= 60;
+  }
+
+  if (motor3ReserveStateDinner == true && motor3FeedState == false)
+  {
+    motor3Feed(motor3CountDinner);
     motor3FeedState = true;
 
     Serial.println("motor3 is running now");
@@ -182,14 +294,16 @@ void motor3Operating()
     if (motor3FeedState)
       Serial.println("motor3 Reset!");
 
-    motor3ReserveState = false;
+    motor3ReserveStateBreakfast = false;
+    motor3ReserveStateLunch = false;
+    motor3ReserveStateDinner = false;
     motor3FeedState = false;
   }
 }
 
 void bluetoothRecieve()
 {
-  String buffer = Serial1.readStringUntil('\n');
+  String buffer = Serial1.readStringUntil('#');
 
   int firstSeparator = buffer.indexOf("/", 0);
   int secondSeparator = buffer.indexOf("/", (firstSeparator + 1));
@@ -200,130 +314,100 @@ void bluetoothRecieve()
   switch (modeBuffer)
   {
   case 1:
-    motor1Gram = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    motor1GramBreakfast = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
 
-    Serial.print("motor1Gram - ");
-    Serial.println(motor1Gram);
+    Serial.print("motor1GramBreakfast - ");
+    Serial.println(motor1GramBreakfast);
+    break;
+
+  case 2:
+    motor1GramLunch = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor1GramLunch - ");
+    Serial.println(motor1GramLunch);
+    break;
+
+  case 3:
+    motor1GramDinner = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor1GramDinner - ");
+    Serial.println(motor1GramDinner);
+    break;
+
+  case 4:
+    motor2CountBreakfast = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor2CountBreakfast - ");
+    Serial.println(motor2CountBreakfast);
+    break;
+
+  case 5:
+    motor2CountLunch = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor2CountLunch - ");
+    Serial.println(motor2CountLunch);
+    break;
+
+  case 6:
+    motor2CountDinner = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor2CountDinner - ");
+    Serial.println(motor2CountDinner);
+    break;
+
+  case 7:
+    motor3CountBreakfast = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor3CountBreakfast - ");
+    Serial.println(motor3CountBreakfast);
+    break;
+
+  case 8:
+    motor3CountLunch = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor3CountLunch - ");
+    Serial.println(motor3CountLunch);
+    break;
+
+  case 9:
+    motor3CountDinner = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+
+    Serial.print("motor3CountDinner - ");
+    Serial.println(motor3CountDinner);
     break;
 
   case 11:
-    motor1BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor1BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
+    motorBreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    motorBreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
 
-    Serial.print("motor1Breakfast - ");
-    Serial.print(motor1BreakfastHour);
+    Serial.print("motorBreakfast - ");
+    Serial.print(motorBreakfastHour);
     Serial.print(":");
-    Serial.print(motor1BreakfastMinute);
+    Serial.print(motorBreakfastMinute);
     Serial.print(":");
     Serial.println("00");
     break;
 
   case 12:
-    motor1LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor1LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
+    motorLunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    motorLunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
 
-    Serial.print("motor1Lunch - ");
-    Serial.print(motor1LunchHour);
+    Serial.print("motorLunch - ");
+    Serial.print(motorLunchHour);
     Serial.print(":");
-    Serial.print(motor1LunchMinute);
+    Serial.print(motorLunchMinute);
     Serial.print(":");
     Serial.println("00");
     break;
 
   case 13:
-    motor1DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor1DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
+    motorDinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
+    motorDinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
 
-    Serial.print("motor1Dinner - ");
-    Serial.print(motor1DinnerHour);
+    Serial.print("motorDinner - ");
+    Serial.print(motorDinnerHour);
     Serial.print(":");
-    Serial.print(motor1DinnerMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 2:
-    motor2Count = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-
-    Serial.print("motor2Count - ");
-    Serial.println(motor2Count);
-    break;
-
-  case 21:
-    motor2BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor2BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor2Breakfast - ");
-    Serial.print(motor2BreakfastHour);
-    Serial.print(":");
-    Serial.print(motor2BreakfastMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 22:
-    motor2LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor2LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor2Lunch - ");
-    Serial.print(motor2LunchHour);
-    Serial.print(":");
-    Serial.print(motor2LunchMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 23:
-    motor2DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor2DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor2Dinner - ");
-    Serial.print(motor2DinnerHour);
-    Serial.print(":");
-    Serial.print(motor2DinnerMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 3:
-    motor3Count = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-
-    Serial.print("motor3Count - ");
-    Serial.println(motor3Count);
-    break;
-
-  case 31:
-    motor3BreakfastHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor3BreakfastMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor3Breakfast - ");
-    Serial.print(motor3BreakfastHour);
-    Serial.print(":");
-    Serial.print(motor3BreakfastMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 32:
-    motor3LunchHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor3LunchMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor3Lunch - ");
-    Serial.print(motor3LunchHour);
-    Serial.print(":");
-    Serial.print(motor3LunchMinute);
-    Serial.print(":");
-    Serial.println("00");
-    break;
-
-  case 33:
-    motor3DinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
-    motor3DinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
-
-    Serial.print("motor3Dinner - ");
-    Serial.print(motor3DinnerHour);
-    Serial.print(":");
-    Serial.print(motor3DinnerMinute);
+    Serial.print(motorDinnerMinute);
     Serial.print(":");
     Serial.println("00");
     break;
