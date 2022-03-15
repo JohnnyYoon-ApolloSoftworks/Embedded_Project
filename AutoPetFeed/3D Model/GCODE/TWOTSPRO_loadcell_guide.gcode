@@ -15649,9 +15649,9 @@ M104 S0
 ;SETTING_3  #2\\ndefinition = two_trees_sapphirepro\\n\\n[metadata]\\ntype = qua
 ;SETTING_3 lity_changes\\nquality_type = standard\\nsetting_version = 19\\n\\n[v
 ;SETTING_3 alues]\\nadhesion_type = none\\nmaterial_bed_temperature = 50\\nsuppo
-;SETTING_3 rt_enable = True\\n\\n", "extruder_quality": ["[general]\\nversion = 
-;SETTING_3 4\\nname = Standard Quality #2\\ndefinition = two_trees_sapphirepro\\
-;SETTING_3 n\\n[metadata]\\ntype = quality_changes\\nquality_type = standard\\ns
-;SETTING_3 etting_version = 19\\nposition = 0\\n\\n[values]\\ngradual_infill_ste
-;SETTING_3 ps = 0\\ninfill_sparse_density = 10\\nmaterial_print_temperature = 18
-;SETTING_3 5\\nwall_thickness = 1\\n\\n"]}
+;SETTING_3 rt_enable = True\\nsupport_type = everywhere\\n\\n", "extruder_qualit
+;SETTING_3 y": ["[general]\\nversion = 4\\nname = Standard Quality #2\\ndefiniti
+;SETTING_3 on = two_trees_sapphirepro\\n\\n[metadata]\\ntype = quality_changes\\
+;SETTING_3 nquality_type = standard\\nsetting_version = 19\\nposition = 0\\n\\n[
+;SETTING_3 values]\\ngradual_infill_steps = 0\\ninfill_sparse_density = 10\\nmat
+;SETTING_3 erial_print_temperature = 185\\nwall_thickness = 1\\n\\n"]}

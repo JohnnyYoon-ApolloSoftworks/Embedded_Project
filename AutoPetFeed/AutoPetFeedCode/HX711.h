@@ -1,3 +1,7 @@
+/*
+ *  HX711 동작 코드
+ */
+
 #include "Arduino.h"
 
 class Hx711

@@ -3,19 +3,23 @@
 #include "HX711.h"
 #include "settings.h"
 
-Hx711 scale(A1, A0);
-DS1302 rtc;
 
+Hx711 scale(A1, A0); // HX711 객체 생성 (전달 인자로 핀 번호를 입력)
+DS1302 rtc; // RTC 객체 생성
+
+// 스텝모터 객체 생성
 // IN4, IN2, IN3, IN1
 Stepper stepMotor1(stepsPerRevolution, motor1In4Pin, motor1In2Pin, motor1In3Pin, motor1In1Pin);
 Stepper stepMotor2(stepsPerRevolution, motor2In4Pin, motor2In2Pin, motor2In3Pin, motor2In1Pin);
 Stepper stepMotor3(stepsPerRevolution, motor3In4Pin, motor3In2Pin, motor3In3Pin, motor3In1Pin);
 
+// RTC 초기화 및 시간 재설정을 위한 함수
 void rtcCalibration()
 {
   rtc.adjust(DateTime(__DATE__, __TIME__));
 }
 
+// 디버깅을 위해 시간 및 무게 데이터 로그를 출력하는 함수
 void debugLog()
 {
   DateTime now = rtc.now();
@@ -25,18 +29,21 @@ void debugLog()
   Serial.println(" g");
 }
 
+// 디버깅을 위해 무게 데이터를 출력하는 함수
 void showWeight()
 {
   Serial.print(scale.gram() * 2, 1);
   Serial.println(" g");
 }
 
+// 디버깅을 위해 시간 데이터를 출력하는 함수
 void showDate()
 {
   DateTime now = rtc.now();
   Serial.println(now.tostr(buf));
 }
 
+// 부저 동작 함수
 void buzzerAlarm(int num)
 {
   for (int i = 0; i < num; i++)
@@ -49,29 +56,32 @@ void buzzerAlarm(int num)
   delay(500);
 }
 
+// 첫번째 스텝모터 동작 함수
 void motor1Feed(int gram)
 {
   while ((scale.gram() * 2) < gram)
   {
-    if ((scale.gram() * 2) >= gram)
+    if ((scale.gram() * 2) >= gram) // 설정된 무게보다 측정된 무게가 크거나 같으면 while문 탈출
       break;
 
-    stepMotor1.step(stepsPerRevolution * 4);
+    stepMotor1.step(stepsPerRevolution * 4);  // 45도 동작을 해야하기 때문에 11.25도 * 4를 함
     delay(100);
   }
-  buzzerAlarm(1);
+  buzzerAlarm(1); // 동작 후 부저 한번 울림
 }
 
+// 두번째 스텝모터 동작 함수
 void motor2Feed(int count)
 {
   for (int i = 0; i < count; i++)
   {
-    stepMotor2.step(stepsPerRevolution * 2);
+    stepMotor2.step(stepsPerRevolution * 2);  // 22.5도 동작을 해야하기 때문에 11.25도 * 2를 함
     delay(100);
   }
-  buzzerAlarm(2);
+  buzzerAlarm(2); // 동작 후 부저 두번 울림
 }
 
+// 세번째 스텝모터 동작 함수
 void motor3Feed(int count)
 {
   for (int i = 0; i < count; i++)
@@ -82,6 +92,7 @@ void motor3Feed(int count)
   buzzerAlarm(3);
 }
 
+// 블루투스로 입력받은 데이터를 기반으로 모터 동작을 결정해주는 함수
 void motor1Operating()
 {
   DateTime now = rtc.now();
@@ -91,7 +102,7 @@ void motor1Operating()
     motor1ReserveStateBreakfast = true;
     motor1ResetTime = now.minute() + 2;
 
-    if (motor1ResetTime >= 60)
+    if (motor1ResetTime >= 60)  // 모터 초기화 시간 저장을 위해 현재 시간에 2분을 더할 때 62분이 아닌 2분으로 처리하기위해 60이 넘으면 60을 빼줌
       motor1ResetTime -= 60;
   }
 
@@ -155,6 +166,7 @@ void motor1Operating()
   }
 }
 
+// 블루투스로 입력받은 데이터를 기반으로 모터 동작을 결정해주는 함수
 void motor2Operating()
 {
   DateTime now = rtc.now();
@@ -228,6 +240,7 @@ void motor2Operating()
   }
 }
 
+// 블루투스로 입력받은 데이터를 기반으로 모터 동작을 결정해주는 함수
 void motor3Operating()
 {
   DateTime now = rtc.now();
@@ -301,9 +314,18 @@ void motor3Operating()
   }
 }
 
+// 블루투스 통신으로부터 데이터를 입력받아 처리 후 저장 하는 함수
 void bluetoothRecieve()
 {
-  String buffer = Serial1.readStringUntil('#');
+  /* 블루투스 통신 수신 데이터 형식 "1/13/00#"
+   * / -> 구분자 : 데이터간의 분할 지원
+   * 첫번째 구분자 이전 -> 전달될 데이터 형식
+   * 1~9 -> 각각 모터의 시간 설정 데이터
+   * 11~13 -> 각각 모터의 급식 양 조절
+   * 두번째 구분자 이전 -> 시간 설정 및 양
+   * 두번째 구분자 이후 -> 분 설정
+   */
+  String buffer = Serial1.readStringUntil('#'); //블루투스 통신에서 수신된 문자열 끝에 포함된 #까지 데이터를 읽어들임
 
   int firstSeparator = buffer.indexOf("/", 0);
   int secondSeparator = buffer.indexOf("/", (firstSeparator + 1));
@@ -429,7 +451,7 @@ void setup()
   stepMotor2.setSpeed(300);
   stepMotor3.setSpeed(300);
 
-  rtcCalibration();
+  rtcCalibration(); // RTC 캘리브레이션 (시간 재설정)
 }
 
 void loop()
