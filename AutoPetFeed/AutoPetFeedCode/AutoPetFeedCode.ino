@@ -37,7 +37,7 @@ void showWeight()
 }
 
 // 디버깅을 위해 시간 데이터를 출력하는 함수
-void showDate()
+  void showDate()
 {
   DateTime now = rtc.now();
   Serial.println(now.tostr(buf));
@@ -426,8 +426,7 @@ void bluetoothRecieve()
     motorDinnerHour = buffer.substring(firstSeparator + 1, secondSeparator).toInt();
     motorDinnerMinute = buffer.substring(secondSeparator + 1, lengthOfBuffer).toInt();
 
-    Serial.print("motorDinner - ");
-    Serial.print(motorDinnerHour);
+    Serial.print("motorDinner - ");    Serial.print(motorDinnerHour);
     Serial.print(":");
     Serial.print(motorDinnerMinute);
     Serial.print(":");
