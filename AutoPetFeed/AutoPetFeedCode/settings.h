@@ -20,7 +20,7 @@ const int motor3In3Pin = 50;
 const int motor3In4Pin = 52; 
 
 // 부저 핀 번호
-const int buzzerPin = 9;
+const int buzzerPin = 7;
 
 char buf[20]; // RTC 데이터 출력 버퍼
 

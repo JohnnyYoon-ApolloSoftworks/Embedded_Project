@@ -459,9 +459,11 @@ void loop()
     bluetoothRecieve();
 
   motor1Operating();
+  delay(3000);
   motor2Operating();
+  delay(3000);
   motor3Operating();
-
+  delay(3000);
   debugLog();
   delay(1000);
 }
