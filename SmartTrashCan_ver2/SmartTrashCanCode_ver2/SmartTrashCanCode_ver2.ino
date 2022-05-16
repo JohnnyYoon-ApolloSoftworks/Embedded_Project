@@ -39,6 +39,9 @@ float duration;
 float distance;
 
 bool operatingState = false;
+bool resetState = false;
+bool closeState = false;
+bool waterState = false;
 
 char buf[20];
 
@@ -85,6 +88,7 @@ void setup()
   pinMode(waterSensorPin, INPUT);
 
   spray();
+  BUZZER(1);
 }
 
 void loop()
@@ -93,7 +97,12 @@ void loop()
   readCds();
   readRtc();
   readWaterSensor();
-  operating();
+
+  if(closeState == true){
+    operating();
+    readDistance();
+  }
+  delay(500);
 }
 
 //-----------------------------------문 개폐여부 판단 코드-----------------------------------
@@ -107,19 +116,17 @@ void readCds()
     lcd.setCursor(0, 1);
     lcd.print("OPEN ");
 
+    closeState = false;
     Serial.println("Door : Open");
   }
-  else if (cds > 600) //뚜껑 닫음
+  else if (cds >= 600) //뚜껑 닫음
   {
     lcd.setCursor(0, 1);
     lcd.print("CLOSE");
 
+    closeState = true;
     Serial.println("Door : Close");
-
-    readDistance(); //얼마나 차는지 확인
-    operating();     //무게를 감지하여 살충제 사용
   }
-  delay(200);
 }
 
 //-----------------------------------쓰레기 양 판단 코드-----------------------------------
@@ -160,7 +167,6 @@ void readDistance()
     Serial.print(distance);
     Serial.println(" cm");
   }
-  delay(100);
 }
 
 //-----------------------------------계절 판단 코드----------------------------------
@@ -169,7 +175,6 @@ void readRtc()
 {
   DateTime now = rtc.now();
   Serial.println(now.tostr(buf));
-  delay(1000);
 
   if (now.month() == 3 || now.month() == 4 || now.month() == 5)
   {
@@ -242,12 +247,23 @@ void operating()
   if (minute % 5 == 0)
     operatingState = true;
   else
-    operatingState = false;
-
-  if (currentWeight >= 20 && operatingState == true) // 20g 이상 , 30분 이면 모터 동작
   {
-    spray();
     operatingState = false;
+    resetState = false;
+  }
+  if (currentWeight >= 20 && operatingState == true && resetState == false) // 20g 이상 , 30분 이면 모터 동작
+  {
+    if (waterState == true)
+    {
+      spray();
+      BUZZER(1);
+    }
+    else
+    {
+      BUZZER(3);
+    }
+    operatingState = false;
+    resetState = true;
   }
 }
 
@@ -257,14 +273,10 @@ void readWaterSensor()
 {
   int water = digitalRead(waterSensorPin);
 
-  if (water == HIGH) //액체 부족하면 led로 알려줌
-  {
-    // BUZZER(3);
-  }
+  if (water == HIGH)
+    waterState = true;
   else
-  {
-    // noTone(buzzerPin);
-  }
+    waterState = false;
 }
 
 //-----------------------------------로드셀 앰프 관련 함수-----------------------------------
